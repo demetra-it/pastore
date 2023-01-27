@@ -1,0 +1,208 @@
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 6ms (Allocations: 4752)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 5ms (Allocations: 4729)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 4ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 5ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 8ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 5ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 5ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 7ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 4ms (Allocations: 4730)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 191372ms (Allocations: 51736)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 21514ms (Allocations: 41026)
+Processing by Guards::ExamplesController#index as HTML
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 13365ms (Allocations: 53321)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 172817ms (Allocations: 61366)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 3834ms (Views: 0.2ms | Allocations: 46945)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 1ms (Views: 0.4ms | Allocations: 315)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 315)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 4ms (Allocations: 4755)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 315)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 4ms (Allocations: 2475)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.2ms | Allocations: 326)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.2ms | Allocations: 326)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.3ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 205)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 196)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 194)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 3ms (Allocations: 5146)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 4ms (Allocations: 5152)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 3ms (Allocations: 5146)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 416)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 419)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 3ms (Allocations: 2951)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 2ms (Allocations: 2953)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 2ms (Allocations: 2864)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 1ms (Allocations: 416)
+Processing by Guards::ExamplesController#index as HTML
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 460)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 416)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 1ms (Allocations: 418)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 418)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Allocations: 418)
+Processing by Guards::ExamplesController#index as HTML
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 461)
+Processing by Guards::ExamplesController#index as HTML
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 461)
+Processing by Guards::ExamplesController#index as HTML
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 331)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 454)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 457)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 457)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 457)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.0ms | Allocations: 444)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 230929ms (Views: 0.1ms | Allocations: 969773)
+Processing by Guards::ExamplesController#index as HTML
+Processing by Guards::ExamplesController#index as HTML
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 91366ms (Views: 0.1ms | Allocations: 30569)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 45670ms (Views: 0.2ms | Allocations: 32343)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Views: 0.1ms | Allocations: 442)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 200 OK in 0ms (Views: 0.1ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 200 OK in 1ms (Views: 0.4ms | Allocations: 324)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 366)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 328)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Allocations: 210)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Allocations: 210)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Allocations: 206)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Allocations: 210)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 0ms (Allocations: 211)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 42156ms (Allocations: 34382)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 107453ms (Allocations: 36374)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 25978ms (Views: 0.3ms | Allocations: 38423)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 328)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 328)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 3ms (Allocations: 2668)
+Processing by Guards::ExamplesController#index as HTML
+Completed 500 Internal Server Error in 3ms (Allocations: 2520)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 338)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 129)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.2ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 336)
+Processing by Guards::ExamplesController#index as HTML
+Filter chain halted as :check_access rendered or redirected
+Completed 403 Forbidden in 0ms (Views: 0.1ms | Allocations: 125)
