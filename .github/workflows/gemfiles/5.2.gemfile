@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in segugio.gemspec
+gemspec name: 'pastore', path: '../../../'
+
+gem 'faker'
+gem 'rake'
+gem 'rspec-rails'
+gem 'shoulda-matchers'
+gem 'pry'
+
+gem 'rails', '~> 5.2.0'
