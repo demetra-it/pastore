@@ -9,6 +9,8 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   it { should respond_to :detect_role }
   it { should respond_to :pastore_default_strategy }
 
+  pending 'should implement #skip_guards!'
+
   it 'default strategy should be "deny"' do
     expect(subject.pastore_default_strategy).to eq :deny
   end
@@ -32,15 +34,22 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   describe '#detect_role' do
     context 'when a role detector is specified' do
       subject(:controller) { described_class.new }
-      let(:available_roles) { %i[admin user guest] }
+      let(:available_roles) { %w[admin user guest] }
       before { described_class.detect_role { available_roles.sample } }
 
       it 'should specify the logic to use for current role detection' do
         expect(controller.instance_eval { pastore_current_role }).to be_in available_roles
       end
 
-      pending 'should forbidden access to action if current role is not allowed'
-      pending 'should allow access to action if current role is allowed'
+      it 'should forbidden access to action if current role is not allowed' do
+        response = get :index
+        expect(response).to have_http_status :forbidden
+      end
+
+      it 'should allow access to action if current role is allowed' do
+        response = get :test_permit_role
+        expect(response).to have_http_status :ok
+      end
     end
 
     context 'when no role detector is specified' do
@@ -77,25 +86,114 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   end
 
   describe '#permit_role' do
-    pending 'should accept a list of symbols'
-    pending 'should accept a list of strings'
+    it 'should accept a list of symbols' do
+      expect { subject.permit_role :admin, :user }.not_to raise_error
+    end
+
+    it 'should accept a list of strings' do
+      expect { subject.permit_role 'admin', 'user' }.not_to raise_error
+    end
 
     context 'when a role is allowed' do
-      pending 'should allow the request'
+      before { subject.detect_role { :admin } }
+
+      it 'should allow the request' do
+        respone = get :test_permit_role
+        expect(respone.status).to eq 200
+      end
     end
 
     context 'when a role is not allowed' do
-      pending 'should respond with 403 Forbidden'
+      before { subject.detect_role { :guest } }
+
+      it 'should respond with 403 Forbidden' do
+        response = get :test_unpermitted_role
+        expect(response.status).to eq 403
+      end
+    end
+  end
+
+  describe '#deny_role' do
+    it 'should accept a list of symbols' do
+      expect { subject.deny_role :admin, :user }.not_to raise_error
+    end
+
+    it 'should accept a list of strings' do
+      expect { subject.deny_role 'admin', 'user' }.not_to raise_error
+    end
+
+    context 'when default strategy is set to :allow' do
+      before do
+        subject.use_allow_strategy!
+        subject.detect_role { :user }
+      end
+
+      it 'should deny the request by default if role is not denied' do
+        response = get :test_denied_role
+        expect(response.status).to eq 200
+      end
+
+      it 'should deny the request if the role is specified with #deny_role' do
+        subject.detect_role { :admin }
+        response = get :test_denied_role
+        expect(response.status).to eq 403
+      end
     end
   end
 
   describe '#authorize_with' do
-    pending 'should accept a block as parameter'
-    pending 'should accept a method name as parameter'
+    it 'should accept a block as parameter' do
+      expect { subject.authorize_with { true } }.not_to raise_error
+    end
+
+    it 'should accept a symbol or string as parameter' do
+      expect { subject.authorize_with :custom_authorization }.not_to raise_error
+      expect { subject.authorize_with 'custom_authorization' }.not_to raise_error
+    end
+
+    it 'should not accept other types of parameters' do
+      expect { subject.authorize_with 123 }.to raise_error ArgumentError
+    end
+
+    it 'should have precedence over #permit_role and #deny_role' do
+      subject.use_deny_strategy!
+      subject.detect_role { :admin }
+      response = get :test_authorization_priority
+      expect(response.status).to eq 403
+
+      subject.use_allow_strategy!
+      response = get :test_authorization_priority2
+      expect(response.status).to eq 200
+    end
 
     context 'when is set' do
-      pending 'should authorize the request with dynamic logic'
+      before { subject.use_deny_strategy! }
+
+      it 'should permit when authorize logic returns true' do
+        response = get :test_authorized_with_permitted
+        expect(response.status).to eq 200
+      end
+
+      it 'should deny when authorize logic returns false' do
+        response = get :test_authorized_with_denied
+        expect(response.status).to eq 403
+      end
+
+      it 'should use custom authorization method when specified' do
+        response = get :test_authorized_with_method
+        expect(response.status).to eq 403
+
+        subject.define_method(:custom_authorization) { true }
+        response = get :test_authorized_with_method
+        expect(response.status).to eq 200
+      end
     end
+  end
+
+  describe '#skip_guards!' do
+    pending 'should accept a list of actions'
+    pending 'should accept :except key'
+    pending 'should skip guards for specified actions'
   end
 end
 # rubocop:enable Metrics/BlockLength
