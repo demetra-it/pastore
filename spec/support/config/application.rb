@@ -40,6 +40,8 @@ module ExampleApplication
   end
 end
 
+Rails.application.credentials.secret_key_base ||= SecureRandom.hex(64)
+
 Rails.application.initialize!
 
 require_relative 'routes'
