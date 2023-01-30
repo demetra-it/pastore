@@ -8,8 +8,11 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   it { should respond_to :use_deny_strategy! }
   it { should respond_to :detect_role }
   it { should respond_to :pastore_default_strategy }
-
-  pending 'should implement #skip_guards!'
+  it { should respond_to :forbidden }
+  it { should respond_to :permit_role }
+  it { should respond_to :deny_role }
+  it { should respond_to :authorize_with }
+  it { should respond_to :skip_guards }
 
   it 'default strategy should be "deny"' do
     expect(subject.pastore_default_strategy).to eq :deny
@@ -94,6 +97,16 @@ RSpec.describe Guards::ExamplesController, type: :controller do
       expect { subject.permit_role 'admin', 'user' }.not_to raise_error
     end
 
+    it 'should not be cumulative' do
+      subject.detect_role { :admin }
+      response = get :test_cumulative_permit_role
+      expect(response.status).to eq 403
+
+      subject.detect_role { :guest }
+      response = get :test_cumulative_permit_role
+      expect(response.status).to eq 200
+    end
+
     context 'when a role is allowed' do
       before { subject.detect_role { :admin } }
 
@@ -120,6 +133,18 @@ RSpec.describe Guards::ExamplesController, type: :controller do
 
     it 'should accept a list of strings' do
       expect { subject.deny_role 'admin', 'user' }.not_to raise_error
+    end
+
+    it 'should not be cumulative' do
+      subject.use_allow_strategy!
+
+      subject.detect_role { :admin }
+      response = get :test_cumulative_deny_role
+      expect(response.status).to eq 200
+
+      subject.detect_role { :guest }
+      response = get :test_cumulative_deny_role
+      expect(response.status).to eq 403
     end
 
     context 'when default strategy is set to :allow' do
@@ -190,10 +215,46 @@ RSpec.describe Guards::ExamplesController, type: :controller do
     end
   end
 
-  describe '#skip_guards!' do
-    pending 'should accept a list of actions'
-    pending 'should accept :except key'
-    pending 'should skip guards for specified actions'
+  describe '#skip_guards' do
+    it 'should accept a list of actions' do
+      expect { subject.skip_guards :index, :show }.not_to raise_error
+    end
+
+    it 'should correctly save skip guards list' do
+      actions_list = %i[action1 action2]
+      subject.skip_guards(*actions_list)
+
+      expect(subject.actions_with_skipped_guards).to eq(actions_list)
+    end
+
+    it 'should accept :except key' do
+      expect { subject.skip_guards except: :index }.not_to raise_error
+    end
+
+    it ':except key could be an array, as string or a symbol' do
+      expect { subject.skip_guards except: %i[index show] }.not_to raise_error
+      expect { subject.skip_guards except: 'index' }.not_to raise_error
+      expect { subject.skip_guards except: :index }.not_to raise_error
+    end
+
+    it 'should skip guards for specified actions' do
+      # Switch to deny strategy
+      subject.use_deny_strategy!
+
+      # Clear skip guards list
+      subject.skip_guards
+
+      # This action should be denied based on its configuration
+      response = get :test_authorized_with_denied
+      expect(response.status).to eq 403
+
+      # Now we'll add this action to the skip guards list
+      subject.skip_guards :test_authorized_with_denied
+
+      # This action should be allowed now
+      response = get :test_authorized_with_denied
+      expect(response.status).to eq 200
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

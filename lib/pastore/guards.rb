@@ -14,7 +14,8 @@ module Pastore
     class_methods do # rubocop:disable Metrics/BlockLength
       attr_accessor :_role_detector, :_default_strategy, :_action_permitted_roles, :_controller_allowed_roles,
                     :_forbidden_callback, :_action_authorization_lambda, :_controller_authorization_lambdas,
-                    :_action_denied_roles, :_controller_denied_roles
+                    :_action_denied_roles, :_controller_denied_roles, :_actions_with_skipped_guards,
+                    :_actions_with_active_guards
 
       # Sets the logic to use for current role detection.
       def detect_role(&block)
@@ -41,14 +42,30 @@ module Pastore
         _default_strategy || :deny
       end
 
+      def skip_guards(*actions, except: [])
+        self._actions_with_active_guards = [except].flatten.compact.map(&:to_sym)
+        self._actions_with_skipped_guards = actions.flatten.compact.map(&:to_sym)
+      end
+
+      def actions_with_active_guards
+        _actions_with_active_guards || []
+      end
+
+      def actions_with_skipped_guards
+        _actions_with_skipped_guards || []
+      end
+
+      # Specify the list of roles allowed to access the action.
       def permit_role(*roles)
-        self._action_permitted_roles = [[_action_permitted_roles] + roles].flatten.compact.uniq.map(&:to_s)
+        self._action_permitted_roles = [roles].flatten.compact.uniq.map(&:to_s)
       end
 
+      # Specify the list of roles denied to access the action.
       def deny_role(*roles)
-        self._action_denied_roles = [[_action_denied_roles] + roles].flatten.compact.uniq.map(&:to_s)
+        self._action_denied_roles = [roles].flatten.compact.uniq.map(&:to_s)
       end
 
+      # Specify a custom lambda to be called to authorize the action.
       def authorize_with(method_name = nil, &block)
         custom_lambda = method_name.to_sym if method_name.is_a?(Symbol) || method_name.is_a?(String)
         custom_lambda = block if block_given?
@@ -60,6 +77,7 @@ module Pastore
         end
       end
 
+      # Save the configurations of the action when the action is defined.
       def method_added(name, *args) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         unless _action_permitted_roles.blank?
           self._controller_allowed_roles ||= {}
@@ -85,26 +103,51 @@ module Pastore
 
     protected
 
+    # Returns the current role detected by the role detector logic.
     def pastore_current_role
       self.class._role_detector&.call&.to_s
     end
 
+    # Returns the list of roles allowed to access current action.
     def pastore_allowed_roles
       self.class._controller_allowed_roles&.dig(action_name.to_sym) || []
     end
 
+    # Returns the list of roles denied to access current action.
     def pastore_denied_roles
       self.class._controller_denied_roles&.dig(action_name.to_sym) || []
     end
 
-    def authorization_lambda
+    # Returns the custom lambda to be called to authorize the action.
+    def pastore_authorization_lambda
       self.class._controller_authorization_lambdas&.dig(action_name.to_sym)
     end
 
-    def pastore_check_access
-      if authorization_lambda.present?
-        authorized = instance_eval(&authorization_lambda) if authorization_lambda.is_a?(Proc)
-        authorized = send(authorization_lambda) if authorization_lambda.is_a?(Symbol)
+    def skip_pastore_guards?
+      active_guards = self.class._actions_with_active_guards
+
+      # If current action is listed in `:except` field of `skip_guards`, then we have to run guards (return false).
+      return false if active_guards&.include?(action_name.to_sym)
+
+      # If `skip_guards` has specified an `:except` field, then we can skip guards, because current action has
+      # implicitely been marked as "to skip guards".
+      return true if active_guards.present?
+
+      # If `skip_guards` don't have the any `except` field, just check if current actions is listed in
+      # `skip_guards`.
+      return true if self.class._actions_with_skipped_guards&.include?(action_name.to_sym)
+
+      # Current action isn't listed in `skip_guards`, so we have to run guards (return false).
+      false
+    end
+
+    # Performs the access check for current action.
+    def pastore_check_access # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
+      return if skip_pastore_guards?
+
+      if pastore_authorization_lambda.present?
+        authorized = instance_eval(&pastore_authorization_lambda) if pastore_authorization_lambda.is_a?(Proc)
+        authorized = send(pastore_authorization_lambda) if pastore_authorization_lambda.is_a?(Symbol)
 
         return if authorized
 

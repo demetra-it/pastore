@@ -117,11 +117,13 @@ end
 
 #### Using `allow` strategy
 
+**!!! WARNING !!!** Be careful when using `allow` strategy, because when enabled it grants access to every action in the controller, which could potentially lead to security issues.
+
 By default `Pastore::Guards` will use `deny` strategy, which means that the access is denied by default, and the only way to access it is through explicit authorization.
 
-Sometimes you might prefere a `allow` strategy instead, in order to allow access to any action within the controller by default, and manually restrict access to specified actions and roles.
+Sometimes you might prefer a `allow` strategy instead, in order to allow access to any action within the controller, and manually restrict access to specified actions and roles.
 
-For doing so you can use `use_allow_strategy!`, which changes the default strategy. In this case you should use `deny_role` to disable the access for a specific role.
+For doing so you can use `use_allow_strategy!`, which changes the default strategy. In this case you should use `deny_role` to disable the access for a specific role or overwrite authorization strategy for specific actions with `authorize_with` helper.
 
 
 
@@ -158,6 +160,56 @@ class MyController < ApplicationController
 end
 ```
 
+#### Using `skip_guards`
+
+Sometime you may want to disable the `Guards` feature for specific actions. For doing so you can use the `skip_guards` helper, which allows you to specify the list of actions for which guards check have to be disabled. In the example below the access to `index` and `show` actions is granted by `skip_guards` which bypasses the guards check. `skip_guards` have priority over `permit_role`, `deny_role` and `authorize_with`, so using those helpers on actions with disabled guards will have no effect and the access will be granted anyway.
+
+```ruby
+class CustomController < ApplicationController
+  use_deny_strategy!
+  skip_guards :index, :show
+
+  def index
+    # ... action code ...
+  end
+
+  authorize_with { false } # this will be ignored because of `skip_guards`
+  def show
+    # ... action code ...
+  end
+end
+```
+
+You can also use `skip_guards` helper with `:except` key, which is useful when you need to disable
+guards for all the actions except a few:
+
+```ruby
+class CustomController < ApplicationController
+  # disable guards for :action_one and :action_two
+  skip_guards except: %i[action_one action_two]
+
+  # Guards DISABLED
+  def index
+    # ... action code ...
+  end
+
+  # Guards ENABLED
+  def action_one
+    # ... action code ...
+  end
+
+  # Guards ENABLED
+  def action_two
+    # ... action code ...
+  end
+
+  # Guards DISABLED
+  def action_three
+    # ... action code ...
+  end
+end
+```
+
 #### `Pastore::Guards` features
 
 Below you can find the list of methods implemented by `Pastore::Guards`, that can be used inside
@@ -170,7 +222,8 @@ your Rails Controller.
 | `detect_role(&block)` | Allows to specify the logic for user role detection. This block will be automatically called to get current user's role information. |
 | `permit_role(*roles)` | Specifies the roles that are allowed to access the action that follows. |
 | `deny_role(*roles)` | Specifies the roles that are not allowed to access the action that follows. |
-| `authorize_with(Symbol|&block)` | Allowe to specify a custom authorization logic to use for action access check. Accepts a method name or a block. |
+| `authorize_with(Symbol|&block)` | Allows to specify a custom authorization logic to use for action access check. Accepts a method name or a block. |
+| `skip_guards(*Symbol|*String, except: *Symbol|*String)` | Allows to disable guards for specific actions. Accepts a list of actions for which to disable guards (e.g. `skip_guards :index, 'show'`), but can be also used to disable guards for all the actions except specified (e.g. `skip_guards except: :index`). |
 
 ## Contributing
 

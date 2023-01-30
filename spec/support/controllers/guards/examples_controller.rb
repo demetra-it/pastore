@@ -50,6 +50,18 @@ module Guards
       render json: { message: 'ok' }
     end
 
+    permit_role :admin, :user
+    permit_role :guest
+    def test_cumulative_permit_role
+      render json: { message: 'ok' }
+    end
+
+    deny_role :admin, :user
+    deny_role :guest
+    def test_cumulative_deny_role
+      render json: { message: 'ok' }
+    end
+
     private
 
     def custom_authorization
