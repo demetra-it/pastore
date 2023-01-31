@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Guards
-  class ExamplesController < ActionController::API
+  class ExamplesController < ActionController::Base
     include Pastore::Guards
 
     def index

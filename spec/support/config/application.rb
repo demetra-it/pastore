@@ -40,7 +40,7 @@ module ExampleApplication
   end
 end
 
-if Rails.gem_version < Gem::Version.new('5.2')
+if Gem::Version.new(Rails.version) < Gem::Version.new('5.2')
   # Generate the secret key base if not present, which is necessary for Rails before v5.2
   Rails.application.secrets.secret_key_base ||= SecureRandom.hex(64)
 end
