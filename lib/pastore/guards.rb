@@ -11,7 +11,8 @@ module Pastore
       before_action :pastore_check_access
     end
 
-    class_methods do # rubocop:disable Metrics/BlockLength
+    # Define ClassMethods to be added to Rails Controllers that include `Pastore::Guards`.
+    module ClassMethods
       attr_accessor :_role_detector, :_default_strategy, :_action_permitted_roles, :_controller_allowed_roles,
                     :_forbidden_callback, :_action_authorization_lambda, :_controller_authorization_lambdas,
                     :_action_denied_roles, :_controller_denied_roles, :_actions_with_skipped_guards,
