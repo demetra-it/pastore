@@ -17,9 +17,6 @@ jobs:
           - "3.1"
 
         rails:
-          - "4.0"
-          - "4.1"
-          - "4.2"
           - "5.0"
           - "5.1"
           - "5.2"
@@ -31,19 +28,6 @@ jobs:
           - ruby: "2.6"
             rails: "7.0"
 
-          - ruby: "2.7"
-            rails: "4.0"
-          - ruby: "2.7"
-            rails: "4.1"
-          - ruby: "2.7"
-            rails: "4.2"
-
-          - ruby: "3.0"
-            rails: "4.0"
-          - ruby: "3.0"
-            rails: "4.1"
-          - ruby: "3.0"
-            rails: "4.2"
           - ruby: "3.0"
             rails: "5.0"
           - ruby: "3.0"
@@ -51,12 +35,6 @@ jobs:
           - ruby: "3.0"
             rails: "5.2"
 
-          - ruby: "3.1"
-            rails: "4.0"
-          - ruby: "3.1"
-            rails: "4.1"
-          - ruby: "3.1"
-            rails: "4.2"
           - ruby: "3.1"
             rails: "5.0"
           - ruby: "3.1"
@@ -73,12 +51,8 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundle-cache: true
-      - name: Install gems with Bundler 1.17.3
-        run: gem install bundler:1.17.3 && bundle _1.17.3_ install
-        if: ${{ matrix.rails == '4.0' || matrix.rails == '4.1' || matrix.rails == '4.2' }}
       - name: Install gems
         run: bundle install
-        if: ${{ matrix.rails > '4.2' }}
       - name: Run tests
         run: bundle exec rspec
 

@@ -4,15 +4,14 @@ require 'active_support/concern'
 
 module Pastore
   # Implements the features for Rails controller access guards.
-  module Guards
+  module Guards # rubocop:disable Metrics/ModuleLength
     extend ActiveSupport::Concern
 
     included do
       before_action :pastore_check_access
     end
 
-    # Define ClassMethods to be added to Rails Controllers that include `Pastore::Guards`.
-    module ClassMethods
+    class_methods do # rubocop:disable Metrics/BlockLength
       attr_accessor :_role_detector, :_default_strategy, :_action_permitted_roles, :_controller_allowed_roles,
                     :_forbidden_callback, :_action_authorization_lambda, :_controller_authorization_lambdas,
                     :_action_denied_roles, :_controller_denied_roles, :_actions_with_skipped_guards,
