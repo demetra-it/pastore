@@ -62,6 +62,7 @@ module Guards
       render json: { message: 'ok' }
     end
 
+
     private
 
     def custom_authorization

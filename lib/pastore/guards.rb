@@ -11,7 +11,7 @@ module Pastore
     included do
       before_action do
         guards = self.class.pastore_guards
-        return if guards.access_granted?(action_name)
+        next if guards.access_granted?(self, action_name)
 
         if guards.forbidden_cbk.present?
           instance_eval(&guards.forbidden_cbk)
@@ -26,7 +26,7 @@ module Pastore
       attr_accessor :_pastore_guards
 
       def pastore_guards
-        self._pastore_guards ||= Pastore::GuardsSettings.new(self)
+        self._pastore_guards ||= Pastore::GuardsSettings.new
       end
 
       # Sets the logic to use for current role detection.

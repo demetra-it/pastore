@@ -5,8 +5,7 @@ module Pastore
   class GuardsSettings
     attr_accessor :strategy, :role_detector, :forbidden_cbk
 
-    def initialize(controller)
-      @controller = controller
+    def initialize
       @strategy = :deny
       @role_detector = nil
       @forbidden_cbk = nil
@@ -54,32 +53,26 @@ module Pastore
       @forced_guards = [actions].flatten.compact.map(&:to_sym)
     end
 
-    def skipped_guards
-      @skipped_guards || []
-    end
-
-    def forced_guards
-      @forced_guards || []
-    end
-
     # Returns the current role for the controller.
-    def current_role
+    def current_role(controller)
       return nil if @role_detector.blank?
 
-      @controller.instance_exec(&@role_detector)
+      controller.instance_exec(&@role_detector)&.to_s
     end
 
-    def access_granted?(action_name) # rubocop:disable Metrics/CyclomaticComplexity
+    def access_granted?(controller, action_name) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       # Get setting for the current action.
       action = @actions[action_name.to_sym]
 
-      return true if skip_guards?(action)
+      return true if skip_guards?(action_name)
 
-      result = authorize_with_lambda(action)
+      result = authorize_with_lambda(controller, action)
       return result unless result.nil?
 
-      (@strategy == :deny && action[:permitted_roles]&.include?(current_role)) ||
-        (@strategy == :allow && !action[:denied_roles]&.include?(current_role))
+      role = current_role(controller)
+
+      (@strategy == :deny && action&.dig(:permitted_roles)&.include?(role)) ||
+        (@strategy == :allow && !action&.dig(:denied_roles)&.include?(role))
     end
 
     private
@@ -102,30 +95,28 @@ module Pastore
       @actions[action_name][:authorization_lambda] = @buffer[:authorization_lambda]
     end
 
-    def skip_guards?(action)
-      active_guards = action&.dig(:skip_guards)
-
+    def skip_guards?(action_name)
       # If current action is listed in `:except` field of `skip_guards`, then we have to run guards (return false).
-      return false if active_guards&.include?(action_name.to_sym)
+      return false if @forced_guards&.include?(action_name.to_sym)
 
       # If `skip_guards` has specified an `:except` field, then we can skip guards, because current action has
       # implicitely been marked as "to skip guards".
-      return true if active_guards.present?
+      return true if @forced_guards.present?
 
       # If `skip_guards` don't have the any `except` field, just check if current actions is listed in
       # `skip_guards`.
-      return true if action&.dig(:skip_guards)&.include?(action_name.to_sym)
+      return true if @skipped_guards&.include?(action_name.to_sym)
 
       # Current action isn't listed in `skip_guards`, so we have to run guards (return false).
       false
     end
 
-    def authorize_with_lambda(action)
+    def authorize_with_lambda(controller, action)
       # When an authorization lambda is defined, it has the priority over the other guards.
       authorization_lambda = action&.dig(:authorization_lambda)
       if authorization_lambda.present?
-        result = @controller.instance_eval(&authorization_lambda) if authorization_lambda.is_a?(Proc)
-        result = @controller.instance_eval(authorization_lambda.to_s) if authorization_lambda.is_a?(Symbol)
+        result = controller.instance_eval(&authorization_lambda) if authorization_lambda.is_a?(Proc)
+        result = controller.instance_eval(authorization_lambda.to_s) if authorization_lambda.is_a?(Symbol)
 
         return result
       end
