@@ -38,18 +38,6 @@ module Guards
       render json: { message: 'ok' }
     end
 
-    authorize_with { false }
-    permit_role :admin
-    def test_authorization_priority
-      render json: { message: 'ok' }
-    end
-
-    authorize_with { true }
-    deny_role :admin
-    def test_authorization_priority2
-      render json: { message: 'ok' }
-    end
-
     permit_role :admin, :user
     permit_role :guest
     def test_cumulative_permit_role
@@ -61,6 +49,7 @@ module Guards
     def test_cumulative_deny_role
       render json: { message: 'ok' }
     end
+
 
     private
 

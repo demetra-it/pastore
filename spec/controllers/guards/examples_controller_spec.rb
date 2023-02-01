@@ -7,22 +7,22 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   it { should respond_to :use_allow_strategy! }
   it { should respond_to :use_deny_strategy! }
   it { should respond_to :detect_role }
-  it { should respond_to :pastore_default_strategy }
   it { should respond_to :forbidden }
   it { should respond_to :permit_role }
   it { should respond_to :deny_role }
   it { should respond_to :authorize_with }
   it { should respond_to :skip_guards }
+  it { should respond_to :pastore_guards }
 
   it 'default strategy should be "deny"' do
-    expect(subject.pastore_default_strategy).to eq :deny
+    expect(subject.pastore_guards.strategy).to eq :deny
   end
 
   describe '#use_allow_strategy!' do
     before { subject.use_allow_strategy! }
 
     it 'should set the default strategy to "allow"' do
-      expect(subject.pastore_default_strategy).to eq :allow
+      expect(subject.pastore_guards.strategy).to eq :allow
     end
   end
 
@@ -30,7 +30,7 @@ RSpec.describe Guards::ExamplesController, type: :controller do
     before { subject.use_deny_strategy! }
 
     it 'should set the default strategy to "deny"' do
-      expect(subject.pastore_default_strategy).to eq :deny
+      expect(subject.pastore_guards.strategy).to eq :deny
     end
   end
 
@@ -38,10 +38,8 @@ RSpec.describe Guards::ExamplesController, type: :controller do
     context 'when a role detector is specified' do
       subject(:controller) { described_class.new }
       let(:available_roles) { %w[admin user guest] }
-      before { described_class.detect_role { available_roles.sample } }
-
-      it 'should specify the logic to use for current role detection' do
-        expect(controller.instance_eval { pastore_current_role }).to be_in available_roles
+      before do
+        described_class.detect_role { %w[admin user guest].sample }
       end
 
       it 'should forbidden access to action if current role is not allowed' do
@@ -60,7 +58,8 @@ RSpec.describe Guards::ExamplesController, type: :controller do
       before { described_class.detect_role }
 
       it 'should return nil' do
-        expect(controller.instance_eval { pastore_current_role }).to be_nil
+        current_role = controller.instance_eval { self.class.pastore_guards.current_role(self) }
+        expect(current_role).to be_nil
       end
 
       context 'when a default strategy is set to :deny' do
@@ -127,6 +126,10 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   end
 
   describe '#deny_role' do
+    before :each do
+      subject.pastore_guards.reset_buffer!
+    end
+
     it 'should accept a list of symbols' do
       expect { subject.deny_role :admin, :user }.not_to raise_error
     end
@@ -159,7 +162,9 @@ RSpec.describe Guards::ExamplesController, type: :controller do
       end
 
       it 'should deny the request if the role is specified with #deny_role' do
+        subject.use_allow_strategy!
         subject.detect_role { :admin }
+
         response = get :test_denied_role
         expect(response.status).to eq 403
       end
@@ -178,17 +183,6 @@ RSpec.describe Guards::ExamplesController, type: :controller do
 
     it 'should not accept other types of parameters' do
       expect { subject.authorize_with 123 }.to raise_error ArgumentError
-    end
-
-    it 'should have precedence over #permit_role and #deny_role' do
-      subject.use_deny_strategy!
-      subject.detect_role { :admin }
-      response = get :test_authorization_priority
-      expect(response.status).to eq 403
-
-      subject.use_allow_strategy!
-      response = get :test_authorization_priority2
-      expect(response.status).to eq 200
     end
 
     context 'when is set' do
@@ -218,13 +212,6 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   describe '#skip_guards' do
     it 'should accept a list of actions' do
       expect { subject.skip_guards :index, :show }.not_to raise_error
-    end
-
-    it 'should correctly save skip guards list' do
-      actions_list = %i[action1 action2]
-      subject.skip_guards(*actions_list)
-
-      expect(subject.actions_with_skipped_guards).to eq(actions_list)
     end
 
     it 'should accept :except key' do

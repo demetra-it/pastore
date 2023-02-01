@@ -222,8 +222,8 @@ your Rails Controller.
 | `detect_role(&block)` | Allows to specify the logic for user role detection. This block will be automatically called to get current user's role information. |
 | `permit_role(*roles)` | Specifies the roles that are allowed to access the action that follows. |
 | `deny_role(*roles)` | Specifies the roles that are not allowed to access the action that follows. |
-| `authorize_with(Symbol|&block)` | Allows to specify a custom authorization logic to use for action access check. Accepts a method name or a block. |
-| `skip_guards(*Symbol|*String, except: *Symbol|*String)` | Allows to disable guards for specific actions. Accepts a list of actions for which to disable guards (e.g. `skip_guards :index, 'show'`), but can be also used to disable guards for all the actions except specified (e.g. `skip_guards except: :index`). |
+| <code>authorize_with(Symbol\|&block)</code> | Allows to specify a custom authorization logic to use for action access check. Accepts a method name or a block. |
+| <code>skip_guards(*Symbol\|*String, except: *Symbol\|*String)</code> | Allows to disable guards for specific actions. Accepts a list of actions for which to disable guards (e.g. `skip_guards :index, 'show'`), but can be also used to disable guards for all the actions except specified (e.g. `skip_guards except: :index`). |
 
 ## Contributing
 
