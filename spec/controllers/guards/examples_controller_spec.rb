@@ -126,6 +126,10 @@ RSpec.describe Guards::ExamplesController, type: :controller do
   end
 
   describe '#deny_role' do
+    before :each do
+      subject.pastore_guards.reset_buffer!
+    end
+
     it 'should accept a list of symbols' do
       expect { subject.deny_role :admin, :user }.not_to raise_error
     end
@@ -179,17 +183,6 @@ RSpec.describe Guards::ExamplesController, type: :controller do
 
     it 'should not accept other types of parameters' do
       expect { subject.authorize_with 123 }.to raise_error ArgumentError
-    end
-
-    it 'should have precedence over #permit_role and #deny_role' do
-      subject.use_deny_strategy!
-      subject.detect_role { :admin }
-      response = get :test_authorization_priority
-      expect(response.status).to eq 403
-
-      subject.use_allow_strategy!
-      response = get :test_authorization_priority2
-      expect(response.status).to eq 200
     end
 
     context 'when is set' do

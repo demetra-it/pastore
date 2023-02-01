@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'active_support/concern'
-require_relative 'guards_settings'
+require_relative 'guards/settings'
 
 module Pastore
   # Implements the features for Rails controller access guards.
   module Guards
     extend ActiveSupport::Concern
+
+    class RoleConflictError < StandardError; end
 
     included do
       before_action do
@@ -26,7 +28,7 @@ module Pastore
       attr_accessor :_pastore_guards
 
       def pastore_guards
-        self._pastore_guards ||= Pastore::GuardsSettings.new
+        self._pastore_guards ||= Pastore::Guards::Settings.new
       end
 
       # Sets the logic to use for current role detection.
@@ -41,12 +43,12 @@ module Pastore
 
       # Sets the default strategy to "deny".
       def use_deny_strategy!
-        pastore_guards.strategy = :deny
+        pastore_guards.use_deny_strategy!
       end
 
       # Sets the default strategy to "allow".
       def use_allow_strategy!
-        pastore_guards.strategy = :allow
+        pastore_guards.use_allow_strategy!
       end
 
       def skip_guards(*actions, except: [])
