@@ -2,7 +2,7 @@
 
 # rubocop:disable Metrics/BlockLength
 RSpec.describe Pastore::Guards::Settings do
-  subject { described_class.new }
+  subject { described_class.new(Guards::EmptyController) }
 
   describe '#strategy' do
     it 'should return :deny by default' do
@@ -355,6 +355,37 @@ RSpec.describe Pastore::Guards::Settings do
 
     it 'should reset @forbidden_cbk' do
       expect(subject.instance_eval { @forbidden_cbk }).to be_nil
+    end
+  end
+
+  describe 'inheritance' do
+    let(:role_detector) { -> { :admin } }
+    let(:forbidden_cbk) { -> { head :forbidden } }
+
+    before :each do
+      Guards::EmptyController.pastore_guards.role_detector = role_detector
+      Guards::EmptyController.pastore_guards.forbidden_cbk = forbidden_cbk
+    end
+
+    after :each do
+      Guards::EmptyController.pastore_guards.reset!
+      Guards::InheritController.pastore_guards.reset!
+    end
+
+    it 'should inherit callbacks from parent controller' do
+      expect(Guards::InheritController.pastore_guards.role_detector).not_to be_nil
+      expect(Guards::InheritController.pastore_guards.role_detector).to eq(role_detector)
+    end
+
+    it 'should overrider parent detect role and forbidden callbacks when defined in child' do
+      role_detector = -> { :user }
+      forbidden_cbk = -> { head :unauthorized }
+
+      Guards::InheritController.pastore_guards.role_detector = role_detector
+      Guards::InheritController.pastore_guards.forbidden_cbk = forbidden_cbk
+
+      expect(Guards::InheritController.pastore_guards.role_detector).to eq(role_detector)
+      expect(Guards::InheritController.pastore_guards.forbidden_cbk).to eq(forbidden_cbk)
     end
   end
 end
