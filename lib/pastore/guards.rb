@@ -28,7 +28,7 @@ module Pastore
       attr_accessor :_pastore_guards
 
       def pastore_guards
-        self._pastore_guards ||= Pastore::Guards::Settings.new
+        self._pastore_guards ||= Pastore::Guards::Settings.new(superclass)
       end
 
       # Sets the logic to use for current role detection.

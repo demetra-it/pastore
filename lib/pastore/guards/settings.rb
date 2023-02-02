@@ -4,10 +4,13 @@ module Pastore
   module Guards
     # Implements a structure where to store the settings for the guards.
     class Settings # rubocop:disable Metrics/ClassLength
-      attr_accessor :role_detector, :forbidden_cbk
+
+      attr_writer :role_detector, :forbidden_cbk
       attr_reader :strategy
 
-      def initialize
+      def initialize(superklass)
+        @super_guards = superklass.pastore_guards if superklass.respond_to?(:pastore_guards)
+        @superclass = superklass
         reset!
       end
 
@@ -19,6 +22,14 @@ module Pastore
         @buffer = {}
         @skipped_guards = []
         @forced_guards = []
+      end
+
+      def role_detector
+        @role_detector || @super_guards&.role_detector
+      end
+
+      def forbidden_cbk
+        @forbidden_cbk || @super_guards&.forbidden_cbk
       end
 
       def use_allow_strategy!
@@ -101,9 +112,9 @@ module Pastore
 
       # Returns the current role for the controller.
       def current_role(controller)
-        return nil if @role_detector.blank?
+        return nil if role_detector.blank?
 
-        controller.instance_exec(&@role_detector)&.to_s
+        controller.instance_exec(&role_detector)&.to_s
       end
 
       def access_granted?(controller, action_name) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
