@@ -4,9 +4,7 @@ module Pastore
   module Guards
     # Implements a structure where to store the settings for the guards.
     class Settings # rubocop:disable Metrics/ClassLength
-
       attr_writer :role_detector, :forbidden_cbk
-      attr_reader :strategy
 
       def initialize(superklass)
         @super_guards = superklass.pastore_guards if superklass.respond_to?(:pastore_guards)
@@ -15,7 +13,7 @@ module Pastore
       end
 
       def reset!
-        @strategy = :deny
+        @strategy = nil
         @role_detector = nil
         @forbidden_cbk = nil
         @actions = {}
@@ -38,6 +36,10 @@ module Pastore
 
       def use_deny_strategy!
         @strategy = :deny
+      end
+
+      def strategy
+        @strategy || @super_guards&.strategy || :deny
       end
 
       def permit_role(*roles)
@@ -130,7 +132,7 @@ module Pastore
 
         return false if action&.dig(:denied_roles)&.include?(role)
 
-        @strategy == :allow || (@strategy == :deny && action&.dig(:permitted_roles)&.include?(role)) || false
+        strategy == :allow || (strategy == :deny && action&.dig(:permitted_roles)&.include?(role)) || false
       end
 
       private
