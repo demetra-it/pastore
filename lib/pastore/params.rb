@@ -41,6 +41,14 @@ module Pastore
         pastore_params.add(name, **options)
       end
 
+      def scope(*keys, &block)
+        return unless block_given?
+
+        pastore_params.set_scope(*keys)
+        block.call
+        pastore_params.reset_scope!
+      end
+
       def method_added(name, *args, &block)
         pastore_params.save_for(name)
         super

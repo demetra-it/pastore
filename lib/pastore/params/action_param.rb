@@ -12,12 +12,14 @@ module Pastore
         'hash' => 'object'
       }.freeze
 
-      attr_reader :name, :type, :modifier, :options
+      attr_reader :name, :type, :modifier, :options, :scope
 
       def initialize(name, **options)
         @name = name
         @options = options
-        @modifier = @options&.fetch(:validator, nil)
+        @scope = [@options&.fetch(:scope, nil)].flatten.compact
+        @array = @options&.fetch(:array, false) == true
+        @modifier = @options&.fetch(:modifier, nil)
         @type = @options&.fetch(:type, :any)
 
         check_options!
@@ -33,6 +35,14 @@ module Pastore
 
       def validate(value)
         Pastore::Params::Validation.new(name, type, value, modifier, **options)
+      end
+
+      def array?
+        @array
+      end
+
+      def name_with_scope
+        [@scope, name].flatten.compact.join('.')
       end
 
       private

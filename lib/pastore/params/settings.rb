@@ -27,11 +27,18 @@ module Pastore
 
       def reset_buffer!
         @buffer = []
+        @scope = nil
+      end
+
+      def set_scope(*keys)
+        @scope = [keys].flatten.compact.map(&:to_sym)
       end
 
       def add(name, **options)
-        param = ActionParam.new(name, **options)
         raise ParamAlreadyDefinedError, "Param #{name} already defined" if @buffer.any? { |p| p.name == name }
+
+        options = { scope: @scope }.with_indifferent_access.merge(options)
+        param = ActionParam.new(name, **options)
 
         @buffer << param
       end
@@ -46,16 +53,43 @@ module Pastore
         return {} if action_params.blank?
 
         action_params.each_with_object({}) do |validator, errors|
-          param_name = validator.name
-          validation = validator.validate(params[param_name])
+          value = params.dig(*validator.scope, validator.name)
+          validation = validator.validate(value)
 
           if validation.valid?
-            params[param_name] = validation.value
+            update_param_value!(params, validator, validation)
+
+            next if validation.errors.empty?
+          end
+
+          errors[validator.name_with_scope] = validation.errors
+        end
+      end
+
+      private
+
+      def update_param_value!(params, validator, validation)
+        if validator.scope.empty?
+          params[validator.name] = validation.value
+          return
+        end
+
+        # Try to create missing scope keys
+        key_path = []
+        scope.each do |key|
+          params[key] ||= {}
+          key_path << key
+
+          if params[key].is_a?(Hash)
+            params = params[key]
             next
           end
 
-          errors[param_name] = validation.errors
+          # if for some reason the scope key is not a hash, we need to add the error to validation errors
+          return validation.add_error(:bad_schema, "Invalid param schema at #{key_path.join(".").inspect}")
         end
+
+        params[validation.name] = value
       end
     end
   end
