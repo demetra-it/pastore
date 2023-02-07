@@ -49,11 +49,11 @@ module Pastore
       end
 
       def validate_string!
-        # if value is required, check for value presence
-        required? && check_if_present!
+        # check for value presence and if it's allowed to be blank
+        check_presence!
 
         # don't go further if value is nil
-        return if value.nil?
+        return if value.to_s.strip == ''
 
         # check if value is a string
         check_if_string!
@@ -63,11 +63,11 @@ module Pastore
       end
 
       def validate_number!
-        # if value is required, check for value presence
-        required? && check_if_present!
+        # check for value presence and if it's allowed to be blank
+        check_presence!
 
-        # don't go further if value is nil
-        return if value.nil?
+        # don't go further if value is empty
+        return if value.to_s.strip == ''
 
         # check if value is a number
         # check if number is between min and max
@@ -76,22 +76,27 @@ module Pastore
       end
 
       def validate_boolean!
-        # if value is required, check for value presence
-        required? && check_if_present!
+        # check for value presence and if it's allowed to be blank
+        check_presence!
 
-        return if value.nil?
+        return if value.to_s.strip == ''
 
         # check if value is a boolean
         check_if_boolean!
       end
 
-      def check_if_present!
-        if value.nil? || (!@allow_blank && value.to_s.strip == '')
-          add_error(:blank, "#{@name} cannot be blank")
-          return false
-        end
+      def check_presence!
+        valid = true
 
-        true
+        # required options ensures that value is present (not nil)
+        valid = false if required? && value.nil?
+
+        # allow_blank option ensures that value is not blank (not empty)
+        valid = false if !@allow_blank && value.to_s.strip == ''
+
+        add_error(:blank, "#{@name} cannot be blank") unless valid
+
+        valid
       end
 
       def check_if_string!
@@ -139,8 +144,13 @@ module Pastore
       end
 
       def check_min_max!
-        add_error(:min, "#{@name} should be greater than #{@min}") if @min && value < @min
-        add_error(:max, "#{@name} should be smaller than #{@max}") if @max && value > @max
+        min_invalid = @min && value < @min
+        max_invalid = @max && value > @max
+
+        add_error(:min, "#{@name} should be greater than #{@min}") if min_invalid
+        add_error(:max, "#{@name} should be smaller than #{@max}") if max_invalid
+
+        min_invalid || max_invalid ? false : true
       end
 
       def check_clamp!

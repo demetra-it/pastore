@@ -75,7 +75,7 @@ RSpec.describe Params::ExamplesController, type: :controller do
         expect(controller.params[:age]).to eq(params[:age])
       end
 
-      context 'when allow_blank is true' do
+      context 'when :allow_blank is true' do
         let(:allow_blank) { true }
 
         it 'blank string should be considered as present' do
@@ -90,14 +90,26 @@ RSpec.describe Params::ExamplesController, type: :controller do
           expect(response).to have_http_status(:ok)
         end
 
-        it 'nil value for integer should be considered as missing' do
+        it 'nil value for integer should be considered as present' do
           params[:age] = nil
+          response = get(action_name, params: params)
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'missing string param should be considered as missing' do
+          params.delete :name
+          response = get(action_name, params: params)
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'missing integer param should be considered as missing' do
+          params.delete :age
           response = get(action_name, params: params)
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
 
-      context 'when allow_blank is false' do
+      context 'when :allow_blank is false' do
         let(:allow_blank) { false }
 
         it 'blank string should be considered as missing' do
@@ -120,10 +132,10 @@ RSpec.describe Params::ExamplesController, type: :controller do
       end
     end
 
-    describe 'type option' do
-      let(:params) { { string: 'John', numeric: 25, object: { a: 1, b: 2 } } }
+    describe ':type option' do
+      let(:params) { { string: 'John', numeric: 25, object: { a: 1, b: 2 }, boolean: true } }
 
-      context 'when type is string' do
+      context 'when type is :string' do
         let(:params_block) do
           lambda do
             subject.param :string, type: 'string'
@@ -147,14 +159,12 @@ RSpec.describe Params::ExamplesController, type: :controller do
         end
       end
 
-      context 'when type is number' do
-        before do
-          subject.param :number, type: 'number'
-          subject.param :integer, type: 'integer'
-          subject.param :float, type: 'float'
-
-          subject.define_method action_name do
-            render json: { message: 'ok' }
+      context 'when type is :number' do
+        let(:params_block) do
+          lambda do
+            subject.param :number, type: 'number'
+            subject.param :integer, type: 'integer'
+            subject.param :float, type: 'float'
           end
         end
 
@@ -176,12 +186,12 @@ RSpec.describe Params::ExamplesController, type: :controller do
           expect(response).to have_http_status(:unprocessable_entity)
         end
 
-        it 'should return a 422 when param value is nil' do
+        it 'should be :ok when param value is nil' do
           response = get(action_name, params: { number: nil })
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:ok)
         end
 
-        it 'should return a 200 when param is not present and allow_blank is default' do
+        it 'should be :ok when param is not present and allow_blank is default' do
           response = get(action_name)
           expect(response).to have_http_status(:ok)
         end
@@ -196,25 +206,300 @@ RSpec.describe Params::ExamplesController, type: :controller do
 
         describe ':min and :max options' do
           let(:range) { 10..20 }
-
-          before do
-            subject.param :number, type: 'number', min: range.min, max: range.max
-            subject.define_method action_name do
-              render json: { message: 'ok' }
+          let(:params_block) do
+            lambda do
+              subject.param :number, type: 'number', min: range.min, max: range.max
             end
           end
 
-          pending 'should return a 422 when param value is less than :min'
-          pending 'should return a 422 when param value is greater than :max'
+          it 'should return a 422 when param value is less than :min' do
+            response = get(action_name, params: { number: range.min - 1 })
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'should return a 422 when param value is greater than :max' do
+            response = get(action_name, params: { number: range.max + 1 })
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
         end
 
         describe ':clamp option' do
-          pending 'should clamp the value to lower bound if it is less than lower bound'
-          pending 'should clamp the value to upper bound if it is greater than upper bound'
+          let(:range) { 10..20 }
+          let(:params_block) do
+            lambda do
+              subject.param :number, type: 'number', clamp: range
+            end
+          end
+
+          it 'should clamp the value to lower bound if it is less than lower bound' do
+            response = get(action_name, params: { number: range.min - 1 })
+            expect(response).to have_http_status(:ok)
+            expect(controller.params[:number]).to eq(range.min)
+          end
+
+          it 'should clamp the value to upper bound if it is greater than upper bound' do
+            response = get(action_name, params: { number: range.max + 1 })
+            expect(response).to have_http_status(:ok)
+            expect(controller.params[:number]).to eq(range.max)
+          end
         end
 
         describe ':allow_blank option' do
-          pending 'should return a 422 when param is missing'
+          let(:allow_blank) { nil }
+          let(:required) { nil }
+
+          let(:params_block) do
+            lambda do
+              subject.param :number, type: 'number', required: required, allow_blank: allow_blank
+            end
+          end
+
+          it 'by default should accept missing param' do
+            response = get(action_name)
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'by default should accept nil value' do
+            response = get(action_name, params: { number: nil })
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should accept blank string' do
+            response = get(action_name, params: { number: '' })
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should not accept invalid value' do
+            response = get(action_name, params: { number: 'John' })
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          context 'when allow_blank is true' do
+            let(:allow_blank) { true }
+
+            it 'should accept missing param' do
+              response = get(action_name)
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'should accept nil value' do
+              response = get(action_name, params: { number: nil })
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'should accept blank string' do
+              response = get(action_name, params: { number: '' })
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'should not accept invalid value' do
+              response = get(action_name, params: { number: 'John' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+          end
+
+          context 'when allow_blank is false' do
+            let(:allow_blank) { false }
+
+            it 'should not accept missing param' do
+              response = get(action_name)
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept nil value' do
+              response = get(action_name, params: { number: nil })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept blank string' do
+              response = get(action_name, params: { number: '' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept invalid value' do
+              response = get(action_name, params: { number: 'John' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+          end
+        end
+      end
+
+      context 'when type is :boolean' do
+        let(:required) { nil }
+        let(:allow_blank) { nil }
+
+        let(:params_block) do
+          lambda do
+            subject.param :boolean, type: 'boolean', required: required, allow_blank: allow_blank
+          end
+        end
+
+        it 'should be :ok when param value is true' do
+          response = get(action_name, params: { boolean: true })
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should be :ok when param value is false' do
+          response = get(action_name, params: { boolean: false })
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should be :ok when param value is nil' do
+          response = get(action_name, params: { boolean: nil })
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should be :ok when param is not present and allow_blank is default' do
+          response = get(action_name)
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'should accept "y", "yes", "t" and "true" as value and convert to true' do
+          %w[y yes t true].each do |value|
+            response = get(action_name, params: { boolean: value })
+            expect(response).to have_http_status(:ok)
+            expect(controller.params[:boolean]).to eq(true)
+          end
+        end
+
+        it 'should accept "n", "no", "f" and "false" as value and convert to false' do
+          %w[n no f false].each do |value|
+            response = get(action_name, params: { boolean: value })
+            expect(response).to have_http_status(:ok)
+            expect(controller.params[:boolean]).to eq(false)
+          end
+        end
+
+        it 'should not accept invalid value' do
+          response = get(action_name, params: { boolean: 'John' })
+          expect(response).to have_http_status(:unprocessable_entity)
+
+          response = get(action_name, params: { boolean: 1 })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        context 'when :required is true' do
+          let(:required) { true }
+
+          it 'should not accept missing param' do
+            response = get(action_name)
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'should accept nil value' do
+            response = get(action_name, params: { boolean: nil })
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should accept blank string' do
+            response = get(action_name, params: { boolean: '' })
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'should not accept invalid value' do
+            response = get(action_name, params: { boolean: 'John' })
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          context 'and :allow_blank is true' do
+            let(:allow_blank) { true }
+
+            it 'should not accept missing param' do
+              response = get(action_name)
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should accept nil value' do
+              response = get(action_name, params: { boolean: nil })
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'should accept blank string' do
+              response = get(action_name, params: { boolean: '' })
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'should not accept invalid value' do
+              response = get(action_name, params: { boolean: 'John' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+          end
+
+          context 'and :allow_blank is false' do
+            let(:allow_blank) { false }
+
+            it 'should not accept missing param' do
+              response = get(action_name)
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept nil value' do
+              response = get(action_name, params: { boolean: nil })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept blank string' do
+              response = get(action_name, params: { boolean: '' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+
+            it 'should not accept invalid value' do
+              response = get(action_name, params: { boolean: 'John' })
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
+          end
+        end
+      end
+
+      context 'when type is :date' do
+        pending 'should be :ok when param is missing'
+        pending 'should be :ok when param is nil'
+        pending 'should be :ok when param is blank'
+        pending 'should be :ok when param is valid date'
+        pending 'should convert param value to date'
+        pending 'should not accept invalid value'
+
+        context 'when :required is true' do
+          pending 'should not accept missing param'
+          pending 'should accept nil value'
+          pending 'should accept blank string'
+          pending 'should convert param value to date'
+          pending 'should not accept invalid value'
+        end
+
+        context 'when :allow_blank is false' do
+          pending 'should not accept missing param'
+          pending 'should not accept nil value'
+          pending 'should not accept blank string'
+          pending 'should convert param value to date'
+          pending 'should not accept invalid value'
+        end
+      end
+
+      context 'when type is :object' do
+        pending 'should be :ok when param is missing'
+        pending 'should be :ok when param is nil'
+        pending 'should be :ok when param is blank'
+        pending 'should be :ok when param is valid object'
+        pending 'should convert param value to object'
+        pending 'should convert JSON string to object'
+
+        context 'when :required is true' do
+          pending 'should not accept missing param'
+          pending 'should accept nil value'
+          pending 'should accept blank string'
+          pending 'should convert param value to object'
+          pending 'should not accept invalid value'
+          pending 'should convert JSON string to object'
+        end
+
+        context 'when :allow_blank is false' do
+          pending 'should not accept missing param'
+          pending 'should not accept nil value'
+          pending 'should not accept blank string'
+          pending 'should convert param value to object'
+          pending 'should not accept invalid value'
+          pending 'should convert JSON string to object'
         end
       end
     end
