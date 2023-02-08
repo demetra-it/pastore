@@ -7,6 +7,7 @@ module Pastore
   # Implements the features for Rails controller params validation.
   module Params
     class ParamAlreadyDefinedError < StandardError; end
+    class ScopeConflictError < StandardError; end
 
     extend ActiveSupport::Concern
 

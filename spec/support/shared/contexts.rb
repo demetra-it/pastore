@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.shared_context 'controller for params specs' do
-  let(:action_name) { SecureRandom.hex(32) }
+  let(:action_name) { SecureRandom.hex(32).to_sym }
   let(:params_block) { -> {} }
 
   before :each do
-    subject.class_eval do
-      include Pastore::Params
-    end
-
     my_action = action_name
+    my_controller = subject.name.underscore.gsub(/_controller$/, '')
     routes.draw do
-      get my_action, to: "params/examples##{my_action}"
+      get my_action, to: "#{my_controller}##{my_action}"
     end
 
     params_block.call

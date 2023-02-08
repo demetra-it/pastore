@@ -19,6 +19,7 @@ module Pastore
         @invalid_params_cbk = nil
 
         reset_buffer!
+        reset_scope!
       end
 
       def invalid_params_cbk
@@ -27,17 +28,26 @@ module Pastore
 
       def reset_buffer!
         @buffer = []
-        @scope = nil
       end
 
       def set_scope(*keys)
         @scope = [keys].flatten.compact.map(&:to_sym)
       end
 
+      def reset_scope!
+        @scope = nil
+      end
+
       def add(name, **options)
+        options = { scope: @scope }.merge(options.symbolize_keys)
+
         raise ParamAlreadyDefinedError, "Param #{name} already defined" if @buffer.any? { |p| p.name == name }
 
-        options = { scope: @scope }.merge(options.symbolize_keys)
+        if @scope.present? && options[:scope].present? && @scope != options[:scope]
+          error = "Scope overwrite attempt detected (current_scope: #{@scope}, param_scope: #{options[:scope]}) for param #{name}"
+          raise ScopeConflictError, error
+        end
+
         param = ActionParam.new(name, **options)
 
         @buffer << param
