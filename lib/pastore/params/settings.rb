@@ -53,7 +53,7 @@ module Pastore
         return {} if action_params.blank?
 
         action_params.each_with_object({}) do |validator, errors|
-          value = params.dig(*validator.scope, validator.name)
+          value = safe_dig(params, *validator.scope, validator.name)
           validation = validator.validate(value)
 
           if validation.valid?
@@ -76,11 +76,11 @@ module Pastore
 
         # Try to create missing scope keys
         key_path = []
-        scope.each do |key|
+        validator.scope.each do |key|
           params[key] ||= {}
           key_path << key
 
-          if params[key].is_a?(Hash)
+          if params[key].is_a?(ActionController::Parameters)
             params = params[key]
             next
           end
@@ -89,7 +89,13 @@ module Pastore
           return validation.add_error(:bad_schema, "Invalid param schema at #{key_path.join(".").inspect}")
         end
 
-        params[validation.name] = value
+        params[validator.name] = validation.value
+      end
+
+      def safe_dig(params, *keys)
+        [keys].flatten.reduce(params) do |acc, key|
+          acc.respond_to?(:key?) ? acc[key] : nil
+        end
       end
     end
   end
