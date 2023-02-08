@@ -37,7 +37,7 @@ module Pastore
       def add(name, **options)
         raise ParamAlreadyDefinedError, "Param #{name} already defined" if @buffer.any? { |p| p.name == name }
 
-        options = { scope: @scope }.with_indifferent_access.merge(options)
+        options = { scope: @scope }.merge(options.symbolize_keys)
         param = ActionParam.new(name, **options)
 
         @buffer << param
