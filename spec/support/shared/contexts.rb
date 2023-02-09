@@ -17,4 +17,8 @@ RSpec.shared_context 'controller for params specs' do
       render json: { message: 'ok' }
     end
   end
+
+  after :each do
+    subject.pastore_params.reset!
+  end
 end
