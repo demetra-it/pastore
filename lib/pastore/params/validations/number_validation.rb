@@ -61,12 +61,6 @@ module Pastore
       def check_clamp!
         @value = @value.clamp(@clamp.first || -Float::INFINITY, @clamp.last || Float::INFINITY)
       end
-
-      def numeric?
-        !Float(value).nil?
-      rescue ArgumentError
-        false
-      end
     end
   end
 end

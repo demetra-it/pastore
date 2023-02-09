@@ -34,6 +34,11 @@ module Pastore
       def check_if_date!
         return true if [Date, Time, DateTime].include?(value.class)
 
+        if numeric?
+          @value = Time.at(value.to_f).to_datetime
+          return true
+        end
+
         # When value is a string, try to parse it as a DateTime object
         if value.is_a?(String)
           begin
@@ -60,6 +65,8 @@ module Pastore
       end
 
       def check_clamp!
+        return true if @clamp.nil?
+
         @value = @value.clamp(@clamp.first || -Float::INFINITY, @clamp.last || Float::INFINITY)
       end
     end

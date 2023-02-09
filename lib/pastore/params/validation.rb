@@ -92,6 +92,13 @@ module Pastore
 
         add_error(:allowed_values, "#{@name} has invalid value: #{value}")
       end
+
+      # check if value is a number
+      def numeric?
+        !Float(value).nil?
+      rescue ArgumentError
+        false
+      end
     end
   end
 end
