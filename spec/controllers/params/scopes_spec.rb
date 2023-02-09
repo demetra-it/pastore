@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 
+module Params
+  class ScopedParamsTestController < ActionController::API
+    include Pastore::Params
+  end
+end
+
 # rubocop:disable Metrics/BlockLength
-RSpec.describe Params::ExamplesController, type: :controller do
+RSpec.describe Params::ScopedParamsTestController, type: :controller do
   subject { described_class }
 
   include_context 'controller for params specs'
