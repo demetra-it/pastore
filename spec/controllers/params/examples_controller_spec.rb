@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 RSpec.describe Params::ExamplesController, type: :controller do
   subject { described_class }
   include_context 'controller for params specs'
@@ -22,6 +21,4 @@ RSpec.describe Params::ExamplesController, type: :controller do
       expect(response).to have_http_status(:ok)
     end
   end
-
 end
-# rubocop:enable Metrics/BlockLength

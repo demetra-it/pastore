@@ -155,7 +155,11 @@ RSpec.describe Params::ObjectParamsTestController, type: :controller do
         expect(controller.params[:object]).to be_blank
       end
 
-      pending 'should rais Pastore::Params::InvalidValueError when default value is invalid'
+      it 'should rais Pastore::Params::InvalidValueError when default value is invalid' do
+        expect do
+          subject.param :object, type: 'object', default: 'invalid'
+        end.to raise_error(Pastore::Params::InvalidValueError)
+      end
     end
 
     context 'when a :modifier is given' do
