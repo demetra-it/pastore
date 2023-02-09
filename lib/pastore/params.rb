@@ -8,6 +8,8 @@ module Pastore
   module Params
     class ParamAlreadyDefinedError < StandardError; end
     class ScopeConflictError < StandardError; end
+    class InvalidValidationTypeError < StandardError; end
+    class InvalidParamTypeError < StandardError; end
 
     extend ActiveSupport::Concern
 

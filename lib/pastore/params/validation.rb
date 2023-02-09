@@ -3,88 +3,67 @@
 module Pastore
   module Params
     # Implements the logic of a single param validation
-    class Validation # rubocop:disable Metrics/ClassLength
+    class Validation
+      require_relative 'validations/string_validation'
+      require_relative 'validations/number_validation'
+      require_relative 'validations/boolean_validation'
+      require_relative 'validations/object_validation'
+      require_relative 'validations/date_validation'
+
+      # Validates the value based on the given type and values with the appropriate validator.
+      def self.validate!(name, type, value, modifier = nil, **options)
+        case type
+        when 'string'  then Pastore::Params::StringValidation.new(name, value, modifier, **options)
+        when 'number'  then Pastore::Params::NumberValidation.new(name, value, modifier, **options)
+        when 'boolean' then Pastore::Params::BooleanValidation.new(name, value, modifier, **options)
+        when 'object'  then Pastore::Params::ObjectValidation.new(name, value, modifier, **options)
+        when 'date'    then Pastore::Params::DateValidation.new(name, value, modifier, **options)
+        when 'any'     then Validation.new(name, 'any', value, modifier, **options)
+        else
+          raise Pastore::Params::InvalidValidationTypeError, "Invalid validation type: #{type}"
+        end
+      end
+
       attr_reader :value, :errors
 
-      def initialize(name, type, value, modifier = nil, **options) # rubocop:disable Metrics/MethodLength
+      def initialize(name, type, value, modifier = nil, **options)
         @name = name
         @type         = type
         @modifier     = modifier
-        @value        = value || options[:default]
+        @value        = value.nil? ? options[:default] : value
         @required     = (options[:required] == true)                           # default: false
         @allow_blank  = (options[:allow_blank].nil? || options[:allow_blank])  # default: true
-        @min          = options[:min]
-        @max          = options[:max]
-        @clamp        = options[:clamp] || [-Float::INFINITY, Float::INFINITY]
 
         @errors = []
 
         validate!
       end
 
+      # Returns true if the value is valid, false otherwise.
       def valid?
         @errors.empty?
       end
 
+      # Returns true if the value is required, false otherwise.
       def required?
         @required
       end
 
+      # Adds an error to the list of errors.
       def add_error(error_type, message)
         @errors << { type: 'param', name: @name, value: @value, error: error_type, message: message }
       end
 
       private
 
+      # Performs a basic validation of the value and applies the modifier.
       def validate!
-        case @type
-        when 'string'  then validate_string!
-        when 'number'  then validate_number!
-        when 'boolean' then validate_boolean!
-        when 'hash'    then validate_hash!
-        when 'array'   then validate_array!
-        end
-
+        # check for value presence and if it's allowed to be blank
+        check_presence!
         apply_modifier!
       end
 
-      def validate_string!
-        # check for value presence and if it's allowed to be blank
-        check_presence!
-
-        # don't go further if value is nil
-        return if value.to_s.strip == ''
-
-        # check if value is a string
-        check_if_string!
-
-        # check string format
-        check_format!
-      end
-
-      def validate_number!
-        # check for value presence and if it's allowed to be blank
-        check_presence!
-
-        # don't go further if value is empty
-        return if value.to_s.strip == ''
-
-        # check if value is a number
-        # check if number is between min and max
-        # check if value is within specified clamping range, and correct if necessary
-        check_if_number! && check_min_max! && check_clamp!
-      end
-
-      def validate_boolean!
-        # check for value presence and if it's allowed to be blank
-        check_presence!
-
-        return if value.to_s.strip == ''
-
-        # check if value is a boolean
-        check_if_boolean!
-      end
-
+      # Checks if the value is present (not nil) and if it's allowed to be blank.
       def check_presence!
         valid = true
 
@@ -99,78 +78,19 @@ module Pastore
         valid
       end
 
-      def check_if_string!
-        return true if value.is_a?(String)
-
-        @value = @value.to_s
-
-        true
-      end
-
-      def check_if_number!
-        return true if value.is_a?(Integer) || value.is_a?(Float)
-
-        if value.is_a?(String) && numeric?
-          @value = value.to_f
-          @value = value.to_i if value.modulo(1).zero?
-
-          return true
-        end
-
-        add_error(:type, "#{@name} has invalid type: #{@type} expected")
-
-        false
-      end
-
-      def check_if_boolean!
-        return true if [true, false].any?(value)
-
-        if value.is_a?(String) && boolean?
-          @value = %w[t true y yes].any?(value.strip.downcase)
-          return true
-        end
-
-        add_error(:type, "#{@name} has invalid type: #{@type} expected")
-
-        false
-      end
-
-      def check_format!
-        return true if @format.nil?
-
-        add_error(:format, "#{@name} has invalid format") if value.match(@format).nil?
-
-        true
-      end
-
-      def check_min_max!
-        min_invalid = @min && value < @min
-        max_invalid = @max && value > @max
-
-        add_error(:min, "#{@name} should be greater than #{@min}") if min_invalid
-        add_error(:max, "#{@name} should be smaller than #{@max}") if max_invalid
-
-        min_invalid || max_invalid ? false : true
-      end
-
-      def check_clamp!
-        @value = @value.clamp(@clamp.first || -Float::INFINITY, @clamp.last || Float::INFINITY)
-      end
-
+      # Applies the modifier to the value.
       def apply_modifier!
         return if @modifier.nil?
 
         @value = @modifier.call(@value)
       end
 
-      def numeric?
-        !Float(value).nil?
-      rescue ArgumentError
-        false
-      end
+      # check if value is in the list of allowed values
+      def check_allowed_values!
+        return if @allowed_values.nil?
+        return if @allowed_values.include?(value)
 
-      def boolean?
-        %w[t true y yes f false n no].any?(value.strip.downcase)
+        add_error(:allowed_values, "#{@name} has invalid value: #{value}")
       end
     end
   end

@@ -4,7 +4,7 @@ module Pastore
   module Params
     # Stores data about action parameters
     class ActionParam
-      AVAILABLE_TYPES = %w[string number boolean object array any].freeze
+      AVAILABLE_TYPES = %w[string number boolean date object array any].freeze
       TYPE_ALIASES = {
         'text' => 'string',
         'integer' => 'number',
@@ -34,7 +34,7 @@ module Pastore
       end
 
       def validate(value)
-        Pastore::Params::Validation.new(name, type, value, modifier, **options)
+        Pastore::Params::Validation.validate!(name, type, value, modifier, **options)
       end
 
       def array?
@@ -63,7 +63,7 @@ module Pastore
         @type = TYPE_ALIASES[@type] unless TYPE_ALIASES[@type].nil?
 
         valid_type = AVAILABLE_TYPES.include?(@type)
-        raise "Invalid param type: #{@type.inspect}" unless valid_type
+        raise Pastore::Params::InvalidParamTypeError, "Invalid param type: #{@type.inspect}" unless valid_type
       end
 
       def check_modifier!
