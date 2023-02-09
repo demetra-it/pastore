@@ -10,6 +10,7 @@ module Pastore
     class ScopeConflictError < StandardError; end
     class InvalidValidationTypeError < StandardError; end
     class InvalidParamTypeError < StandardError; end
+    class InvalidValueError < StandardError; end
 
     extend ActiveSupport::Concern
 

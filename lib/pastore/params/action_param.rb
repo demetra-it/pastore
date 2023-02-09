@@ -25,14 +25,6 @@ module Pastore
         check_options!
       end
 
-      def string?
-        @type == 'string'
-      end
-
-      def required?
-        options[:required]
-      end
-
       def validate(value)
         Pastore::Params::Validation.validate!(name, type, value, modifier, **options)
       end
@@ -79,7 +71,10 @@ module Pastore
       def check_default!
         return if options[:default].nil?
 
-        # TODO: check default value type
+        validation = Pastore::Params::Validation.validate!(name, type, options[:default], modifier, **options)
+        return if validation.valid?
+
+        raise Pastore::Params::InvalidValueError, "Invalid default value: #{validation.errors.join(",")}"
       end
 
       def check_min_max!
