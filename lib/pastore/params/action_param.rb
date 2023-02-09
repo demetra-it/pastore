@@ -110,7 +110,7 @@ module Pastore
         return if options[:clamp].nil?
 
         raise 'Invalid clamp' unless options[:clamp].is_a?(Array) || options[:clamp].is_a?(Range)
-        raise 'Invalid clamp range' unless options[:clamp].first.to_i < options[:clamp].last.to_i
+        raise 'Invalid clamp range' unless (options[:clamp].first <=> options[:clamp].last) <= 0
       end
     end
   end
