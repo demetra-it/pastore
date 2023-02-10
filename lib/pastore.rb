@@ -2,7 +2,7 @@
 
 require_relative 'pastore/version'
 require_relative 'pastore/guards'
-require_relative 'pastore/params_validators'
+require_relative 'pastore/params'
 
 module Pastore
   class Error < StandardError; end

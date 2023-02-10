@@ -5,8 +5,11 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in pastore.gemspec
 gemspec
 
-gem 'faker'
-gem 'rake'
-gem 'rspec-rails'
-gem 'shoulda-matchers'
-gem 'pry'
+group :test do
+  gem 'faker'
+  gem 'pry'
+  gem 'rake'
+  gem 'rspec-rails'
+  gem 'shoulda-matchers'
+  gem 'simplecov'
+end

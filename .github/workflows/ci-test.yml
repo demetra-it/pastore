@@ -45,6 +45,7 @@ jobs:
     env:
       BUNDLE_GEMFILE: .github/workflows/gemfiles/${{ matrix.rails }}.gemfile
 
+
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -53,7 +54,11 @@ jobs:
           bundler-cache: true
       - name: Install gems
         run: bundle install
-      - name: Run tests
-        run: bundle exec rspec
+      - name: Report Test results to CodeClimate
+        uses: paambaati/codeclimate-action@v3.2.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: bundle exec rspec
 
 

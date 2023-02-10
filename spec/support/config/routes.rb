@@ -11,4 +11,11 @@ Rails.application.routes.draw do
       get :test_cumulative_deny_role, on: :collection
     end
   end
+
+  namespace :params do
+    resources :examples do
+      get 'test_required', on: :collection
+      get 'customtest', on: :collection
+    end
+  end
 end
