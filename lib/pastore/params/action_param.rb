@@ -109,8 +109,49 @@ module Pastore
       def check_clamp!
         return if options[:clamp].nil?
 
-        raise 'Invalid clamp' unless options[:clamp].is_a?(Array) || options[:clamp].is_a?(Range)
-        raise 'Invalid clamp range' unless (options[:clamp].first <=> options[:clamp].last) <= 0
+        check_clamp_type!
+        convert_clamp_to_array!
+        normalize_datetime_clamp!
+        check_clamp_bounds!
+      end
+
+      def check_clamp_type!
+        return if options[:clamp].nil?
+        return if [Array, Range].include?(options[:clamp].class)
+
+        raise Pastore::Params::InvalidValueError, "Invalid clamp value: #{options[:clamp].inspect}"
+      end
+
+      def convert_clamp_to_array!
+        clamp = options[:clamp]
+
+        options[:clamp] = clamp.is_a?(Array) ? [clamp.first, clamp.last] : [clamp.begin, clamp.end]
+      end
+
+      def check_clamp_bounds!
+        clamp = options[:clamp]
+        return if clamp.first.nil? || clamp.last.nil?
+
+        raise Pastore::Params::InvalidValueError, "Invalid clamp range: #{clamp.inspect}" if clamp.first > clamp.last
+      end
+
+      def normalize_datetime_clamp!
+        return unless @type == 'date'
+
+        options[:clamp] = options[:clamp].map do |d|
+          return d if d.nil?
+
+          case d
+          when Date then d
+          when String then DateTime.parse(d.to_s)
+          when Integer, Float then Time.at(d).to_datetime
+          when Time then d.to_datetime
+          else
+            raise Pastore::Params::InvalidValueError, "Invalid clamp value: #{options[:clamp].inspect}"
+          end
+        end
+      rescue Date::Error
+        raise Pastore::Params::InvalidValueError, "Invalid clamp value: #{options[:clamp].inspect}"
       end
     end
   end

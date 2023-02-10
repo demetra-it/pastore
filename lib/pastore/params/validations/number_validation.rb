@@ -43,7 +43,7 @@ module Pastore
           return true
         end
 
-        add_error(:type, "#{@name} has invalid type: #{@type} expected")
+        add_error(:invalid_type, "#{@name} has invalid type: #{@type} expected")
 
         false
       end
@@ -52,8 +52,8 @@ module Pastore
         min_invalid = @min && value < @min
         max_invalid = @max && value > @max
 
-        add_error(:min, "#{@name} should be greater than #{@min}") if min_invalid
-        add_error(:max, "#{@name} should be smaller than #{@max}") if max_invalid
+        add_error(:too_small, "#{@name} should be greater than #{@min}") if min_invalid
+        add_error(:too_large, "#{@name} should be smaller than #{@max}") if max_invalid
 
         min_invalid || max_invalid ? false : true
       end

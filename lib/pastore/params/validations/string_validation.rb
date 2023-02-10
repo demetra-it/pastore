@@ -41,7 +41,7 @@ module Pastore
       def check_format!
         return true if @format.nil?
 
-        add_error(:format, "#{@name} has invalid format") if value.match(@format).nil?
+        add_error(:invalid_format, "#{@name} has invalid format") if value.match(@format).nil?
 
         true
       end

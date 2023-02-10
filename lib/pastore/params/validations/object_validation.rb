@@ -40,7 +40,7 @@ module Pastore
           end
         end
 
-        add_error(:type, "#{@name} has invalid type: #{@type} expected")
+        add_error(:invalid_type, "#{@name} has invalid type: #{@type} expected")
 
         false
       end

@@ -185,6 +185,31 @@ RSpec.describe Params::DateParamsTestController, type: :controller do
         expect { params_block.call }.to raise_error(Pastore::Params::InvalidValueError)
       end
     end
+
+    context 'when :clamp is set' do
+      let(:params_block) do
+        lambda do
+          subject.param :date, type: 'date', clamp: '2018-01-01'..'2018-01-31'
+        end
+      end
+
+      it 'should clamp param value to min when param is less than min' do
+        response = get(action_name, params: { date: '2017-01-31' })
+        expect(response).to have_http_status(:ok)
+        expect(controller.params[:date]).to eq(Date.new(2018, 1, 1))
+      end
+
+      it 'should clamp param value to max when param is greater than max' do
+        response = get(action_name, params: { date: '2020-02-01' })
+        expect(response).to have_http_status(:ok)
+        expect(controller.params[:date]).to eq(Date.new(2018, 1, 31))
+      end
+
+      it 'should not clamp param value when param is in range' do
+        response = get(action_name, params: { date: '2018-01-15' })
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

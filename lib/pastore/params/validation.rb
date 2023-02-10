@@ -33,6 +33,8 @@ module Pastore
         @value        = value.nil? ? options[:default] : value
         @required     = (options[:required] == true)                           # default: false
         @allow_blank  = (options[:allow_blank].nil? || options[:allow_blank])  # default: true
+        @allowed_values = options[:in]
+        @exclude_values = options[:exclude]
 
         @errors = []
 
@@ -73,7 +75,7 @@ module Pastore
         # allow_blank option ensures that value is not blank (not empty)
         valid = false if !@allow_blank && value.to_s.strip == ''
 
-        add_error(:blank, "#{@name} cannot be blank") unless valid
+        add_error(:is_blank, "#{@name} cannot be blank") unless valid
 
         valid
       end
@@ -87,10 +89,22 @@ module Pastore
 
       # check if value is in the list of allowed values
       def check_allowed_values!
+        check_inclusion!
+        check_exclusion!
+      end
+
+      def check_inclusion!
         return if @allowed_values.nil?
         return if @allowed_values.include?(value)
 
-        add_error(:allowed_values, "#{@name} has invalid value: #{value}")
+        add_error(:not_allowed, "#{@name} has invalid value: #{value}")
+      end
+
+      def check_exclusion!
+        return if @exclude_values.nil?
+        return unless @exclude_values.include?(value)
+
+        add_error(:not_allowed, "#{@name} has invalid value: #{value}")
       end
 
       # check if value is a number

@@ -200,6 +200,82 @@ RSpec.describe Params::StringParamsTestController, type: :controller do
         end
       end
     end
+
+    describe ':in option' do
+      context 'when :in is not set' do
+        let(:params_block) do
+          lambda do
+            subject.param :string, type: 'string'
+          end
+        end
+
+        it 'should accept any string param' do
+          value = SecureRandom.base64(10)
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:ok)
+          expect(controller.params[:string]).to eq(value)
+        end
+      end
+
+      context 'when :in is specified' do
+        let(:params_block) do
+          lambda do
+            subject.param :string, type: 'string', in: %w[John Jane]
+          end
+        end
+
+        it 'should accept string param that is in :in array' do
+          value = 'John'
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:ok)
+          expect(controller.params[:string]).to eq(value)
+        end
+
+        it 'should not accept string param that is not in :in array' do
+          value = 'Jack'
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+    end
+
+    describe ':exclude option' do
+      context 'when :exclude is not set' do
+        let(:params_block) do
+          lambda do
+            subject.param :string, type: 'string'
+          end
+        end
+
+        it 'should accept any string param' do
+          value = SecureRandom.base64(10)
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:ok)
+          expect(controller.params[:string]).to eq(value)
+        end
+      end
+
+      context 'when :exclude is specified' do
+        let(:params_block) do
+          lambda do
+            subject.param :string, type: 'string', exclude: %w[John Jane]
+          end
+        end
+
+        it 'should not accept string param that is in :exclude array' do
+          value = 'John'
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'should accept string param that is not in :exclude array' do
+          value = 'Jack'
+          response = get(action_name, params: { string: value })
+          expect(response).to have_http_status(:ok)
+          expect(controller.params[:string]).to eq(value)
+        end
+      end
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
