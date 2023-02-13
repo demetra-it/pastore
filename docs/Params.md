@@ -20,6 +20,9 @@ To start using `Pastore::Params` you just need to include `Pastore::Params` modu
 class ApplicationController < ActionController::API
   include Pastore::Params
 
+  # Specify response status code to use for invalid params (default: unprocessable_entity)
+  invalid_params_status :bad_request
+
   # Here you can customize the response to return on invalid params
   on_invalid_params do
     render json: { message: 'Invalid params' }

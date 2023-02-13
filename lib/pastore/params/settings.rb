@@ -7,7 +7,7 @@ module Pastore
   module Params
     # Implements the logic for params settings storage for a controller.
     class Settings
-      attr_writer :invalid_params_cbk
+      attr_writer :invalid_params_cbk, :response_status
 
       def initialize(superklass)
         @super_params = superklass.pastore_params if superklass.respond_to?(:pastore_params)
@@ -17,6 +17,7 @@ module Pastore
       def reset!
         @actions = {}
         @invalid_params_cbk = nil
+        @response_status = nil
 
         reset_buffer!
         reset_scope!
@@ -24,6 +25,10 @@ module Pastore
 
       def invalid_params_cbk
         @invalid_params_cbk || @super_params&.invalid_params_cbk
+      end
+
+      def response_status
+        @response_status || @super_params&.response_status || :unprocessable_entity
       end
 
       def reset_buffer!

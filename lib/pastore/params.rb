@@ -22,9 +22,9 @@ module Pastore
 
         if pastore_params.invalid_params_cbk.present?
           instance_eval(&pastore_params.invalid_params_cbk)
-          response.status = :unprocessable_entity
+          response.status = pastore_params.response_status
         else
-          render json: { message: 'Unprocessable Entity', errors: validation_errors }, status: :unprocessable_entity
+          render json: { message: 'Unprocessable Entity', errors: validation_errors }, status: pastore_params.response_status
         end
       end
     end
@@ -39,6 +39,10 @@ module Pastore
 
       def on_invalid_params(&block)
         pastore_params.invalid_params_cbk = block
+      end
+
+      def invalid_params_status(status)
+        pastore_params.response_status = status
       end
 
       def param(name, **options)

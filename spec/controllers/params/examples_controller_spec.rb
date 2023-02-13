@@ -53,5 +53,60 @@ RSpec.describe Params::ExamplesController, type: :controller do
       expect(json_body).not_to eq(result_message)
     end
   end
+
+  describe '#invalid_params_status' do
+    let(:params_block) do
+      lambda do
+        subject.param :item, type: :number, allow_blank: false
+      end
+    end
+
+    it 'should return :unprocessable_entity by default' do
+      expect(subject.pastore_params.response_status).to eq(:unprocessable_entity)
+    end
+
+    it 'should return :unprocessable_entity if an invalid param is set' do
+      get(action_name, params: { item: 'invalid' })
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    context 'when :invalid_params_status is provided' do
+      let(:params_block) do
+        lambda do
+          subject.param :item, type: :number, allow_blank: false
+          subject.invalid_params_status(:bad_request)
+        end
+      end
+
+      it 'should return :bad_request if an invalid param is set' do
+        get(action_name, params: { item: 'invalid' })
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context 'when inherited' do
+      let(:child_class) { Class.new(described_class) }
+
+      before do
+        child_class.class_eval do
+          param :item, type: :number, allow_blank: false
+          invalid_params_status(:bad_request)
+        end
+      end
+
+      it 'should overwrite parent response_status when for children is specified a different value' do
+        expect(described_class.pastore_params.response_status).to eq(:unprocessable_entity)
+        expect(child_class.pastore_params.response_status).to eq(:bad_request)
+      end
+
+      it 'should fallback to invalid_params_status of parent class when not set' do
+        described_class.invalid_params_status(:forbidden)
+        child_class.pastore_params.reset!
+
+        expect(described_class.pastore_params.response_status).to eq(:forbidden)
+        expect(child_class.pastore_params.response_status).to eq(:forbidden)
+      end
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength
