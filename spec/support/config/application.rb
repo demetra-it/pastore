@@ -9,6 +9,11 @@ require 'rails'
 require 'action_controller/railtie'
 require 'action_view/railtie'
 
+require 'simplecov'
+SimpleCov.start do
+  add_filter '/spec/'
+end
+
 Bundler.require(*Rails.groups)
 
 module ExampleApplication

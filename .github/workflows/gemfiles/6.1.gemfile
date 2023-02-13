@@ -6,9 +6,10 @@ source 'https://rubygems.org'
 gemspec name: 'pastore', path: '../../../'
 
 gem 'faker'
+gem 'pry'
 gem 'rake'
 gem 'rspec-rails'
 gem 'shoulda-matchers'
-gem 'pry'
+gem 'simplecov'
 
 gem 'rails', '~> 6.1.0'
