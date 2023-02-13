@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pastore (0.0.4)
+    pastore (0.1.0)
       rails (>= 4.0)
 
 GEM

@@ -1,6 +1,8 @@
 ## [Unreleased]
 
-- [NEW] First implementation of `Pastore::Params` feature.
+## [0.1.0] - 2023-02-13
+
+- [NEW] Implemented `Pastore::Params` feature for params validation.
 
 ## [0.0.4] - 2023-02-02
 
