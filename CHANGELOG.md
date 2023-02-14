@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.1.1] - 2023-02-14
+
 - [FIX] Accept `Array` values as valid falues for `:object` params.
 
 ## [0.1.0] - 2023-02-13
