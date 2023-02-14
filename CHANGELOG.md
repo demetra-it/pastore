@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+- [FIX] Accept `Array` values as valid falues for `:object` params.
+
 ## [0.1.0] - 2023-02-13
 
 - [NEW] Implemented `Pastore::Params` feature for params validation.

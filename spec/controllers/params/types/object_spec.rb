@@ -51,6 +51,11 @@ RSpec.describe Params::ObjectParamsTestController, type: :controller do
       expect(controller.params[:object].as_json).to eq(value)
     end
 
+    it 'should accept array as valid param' do
+      response = get(action_name, params: { object: [] })
+      expect(response).to have_http_status(:ok)
+    end
+
     context 'when :required is true' do
       let(:params_block) do
         lambda do
@@ -153,6 +158,12 @@ RSpec.describe Params::ObjectParamsTestController, type: :controller do
       it 'should not set the param to default value when is blank' do
         get(action_name, params: { object: '' })
         expect(controller.params[:object]).to be_blank
+      end
+
+      it 'should accept array as default value' do
+        expect do
+          subject.param :object, type: 'object', default: []
+        end.not_to raise_error
       end
 
       it 'should rais Pastore::Params::InvalidValueError when default value is invalid' do
