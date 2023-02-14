@@ -71,7 +71,7 @@ class UsersController < ApplicationController
     param :name, type: :string, allow_blank: false
     # For string params you can set a format regexp validation, which will be automatically applied
     param :email, type: :string, required: true, format: URI::MailTo::EMAIL_REGEXP,
-                  modifier: -> { |v| v.strip.downcase }
+                  modifier: ->(v) { v.strip.downcase }
     param :birth_date, type: :date, required: true, max: DateTime.now
   end
   # You can also specify the scope inline
