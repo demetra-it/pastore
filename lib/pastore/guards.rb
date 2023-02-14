@@ -24,6 +24,10 @@ module Pastore
       end
     end
 
+    def current_role
+      self.class.pastore_guards.current_role(self)
+    end
+
     class_methods do # rubocop:disable Metrics/BlockLength
       attr_accessor :_pastore_guards
 

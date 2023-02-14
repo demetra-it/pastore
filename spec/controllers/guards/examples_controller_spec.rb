@@ -39,7 +39,8 @@ RSpec.describe Guards::ExamplesController, type: :controller do
       subject(:controller) { described_class.new }
       let(:available_roles) { %w[admin user guest] }
       before do
-        described_class.detect_role { %w[admin user guest].sample }
+        my_available_values = available_roles
+        described_class.detect_role { my_available_values.sample }
       end
 
       it 'should forbidden access to action if current role is not allowed' do
@@ -50,6 +51,11 @@ RSpec.describe Guards::ExamplesController, type: :controller do
       it 'should allow access to action if current role is allowed' do
         response = get :test_permit_role
         expect(response).to have_http_status :ok
+      end
+
+      it 'should use it to return the value of #current_role' do
+        expect(controller).to respond_to :current_role
+        expect(controller.current_role).to be_in(available_roles)
       end
     end
 
