@@ -28,7 +28,7 @@ module Pastore
       end
 
       def check_if_object!
-        return true if [Hash, HashWithIndifferentAccess, ActionController::Parameters].include?(value.class)
+        return true if [Hash, HashWithIndifferentAccess, ActionController::Parameters, Array].include?(value.class)
 
         # When value is a string, try to parse it as JSON
         if value.is_a?(String)
