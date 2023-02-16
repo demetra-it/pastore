@@ -21,7 +21,7 @@ module Pastore
         next if validation_errors.empty?
 
         if pastore_params.invalid_params_cbk.present?
-          instance_eval(&pastore_params.invalid_params_cbk)
+          instance_exec(validation_errors, &pastore_params.invalid_params_cbk)
           response.status = pastore_params.response_status
         else
           render json: { message: 'Unprocessable Entity', errors: validation_errors }, status: pastore_params.response_status

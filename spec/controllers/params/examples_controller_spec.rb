@@ -52,6 +52,19 @@ RSpec.describe Params::ExamplesController, type: :controller do
       expect(response).to have_http_status(:ok)
       expect(json_body).not_to eq(result_message)
     end
+
+    it 'should pass errors to `on_invalid_params` callback' do
+      validation_errors = nil
+      subject.on_invalid_params do |errors|
+        validation_errors = errors
+      end
+
+      response = get(action_name, params: { item: 'invalid' })
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(validation_errors).not_to be_nil
+      expect(validation_errors).to be_a(Hash)
+      expect(validation_errors).to have_key('item')
+    end
   end
 
   describe '#invalid_params_status' do
