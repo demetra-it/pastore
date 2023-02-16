@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.2.1] - 2023-02-16
+
+- [FIX] Pass validation errors to `on_invalid_params` block, in order to be able to customize the errors returned on invalid params response.
+
 ## [0.2.0] - 2023-02-16
 
 - [NEW] Implemented the feature which allows to get the current role with `#current_role` method inside controllers actions.

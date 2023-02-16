@@ -2,6 +2,8 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/8f203ba7696c063e9cd2/maintainability)](https://codeclimate.com/github/demetra-it/pastore/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8f203ba7696c063e9cd2/test_coverage)](https://codeclimate.com/github/demetra-it/pastore/test_coverage)
+[![Gem Version](https://badge.fury.io/rb/pastore.svg)](https://badge.fury.io/rb/pastore)
+
 
 Pastore is a powerful gem for Rails that simplifies the process of validating parameters and controlling access to actions in your controllers.
 With Pastore, you can easily define validations for your parameters, ensuring that they meet specific requirements before being passed to your controller actions.
