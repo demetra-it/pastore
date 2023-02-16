@@ -24,8 +24,8 @@ class ApplicationController < ActionController::API
   invalid_params_status :bad_request
 
   # Here you can customize the response to return on invalid params
-  on_invalid_params do
-    render json: { message: 'Invalid params' }
+  on_invalid_params do |validation_errors|
+    render json: { message: 'Invalid params', errors: validation_errors }
   end
 
   # ...
