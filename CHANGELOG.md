@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.2.0] - 2023-02-16
+
 - [NEW] Implemented the feature which allows to get the current role with `#current_role` method inside controllers actions.
 
 ## [0.1.1] - 2023-02-14
