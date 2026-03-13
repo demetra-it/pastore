@@ -12,4 +12,7 @@ gem 'rspec-rails'
 gem 'shoulda-matchers'
 gem 'simplecov'
 
+
+
 gem 'rails', '~> 8.0.0'
+ruby '>= 3.2'
