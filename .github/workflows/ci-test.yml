@@ -71,6 +71,10 @@ jobs:
             rails: "5.1"
           - ruby: "3.4"
             rails: "5.2"
+          - ruby: "3.4"
+            rails: "6.0"
+          - ruby: "3.4"
+            rails: "6.1"
 
     env:
       BUNDLE_GEMFILE: .github/workflows/gemfiles/${{ matrix.rails }}.gemfile
