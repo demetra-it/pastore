@@ -90,9 +90,11 @@ jobs:
           bundler-cache: true
       - name: Install gems
         run: bundle install
-      - name: Report Test results to CodeClimate
-        uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-        with:
-          coverageCommand: bundle exec rspec
+      - name: Run tests
+        run: bundle exec rspec
+      # - name: Report Test results to CodeClimate
+      #   uses: paambaati/codeclimate-action@v3.2.0
+      #   env:
+      #     CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      #   with:
+      #     coverageCommand: bundle exec rspec
