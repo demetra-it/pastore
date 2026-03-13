@@ -13,4 +13,3 @@ gem 'shoulda-matchers'
 gem 'simplecov'
 
 gem 'rails', '~> 8.1.0'
-ruby '>= 3.2'
